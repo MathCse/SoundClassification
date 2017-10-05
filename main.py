@@ -35,10 +35,10 @@ def extractFeatures(filename):
 
     return mfccs, chroma, mel, contrast, tonnetz
 
-def parse_audio_files(filepath,file_ext='*.ogg'):
+def parse_audio_files(parent_dir,sub_dirs,file_ext='*.ogg'):
     features, labels = np.empty((0,193)), np.empty(0)
-    for label, sub_dir in enumerate(filepath):
-        for fn in glob.glob(os.path.join(filepath, file_ext)):
+    for label, sub_dir in enumerate(sub_dirs):
+        for fn in glob.glob(os.path.join(parent_dir, sub_dir, file_ext)):
             mfccs, chroma, mel, contrast,tonnetz = extractFeatures(fn)
             extFeatures = np.hstack([mfccs,chroma,mel,contrast,tonnetz])
             features = np.vstack([features,extFeatures])
