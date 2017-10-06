@@ -5,6 +5,7 @@ import librosa as lb
 import os
 import librosa.display
 from IPython.display import Image
+from sklearn.externals.six import StringIO
 
 #Fonction pour faire un spectrogramme à partir d'un son importé
 def specAudioFile(filepath):

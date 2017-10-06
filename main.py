@@ -1,7 +1,7 @@
 import dataset_functions as dt
 import time
 import classifier_function as cf
-
+import plot_functions as plf
 
 
 # ************ Pense-bête des différents attributs ************
@@ -14,14 +14,18 @@ import classifier_function as cf
 
 # *************************************************************
 
-
+datasetDir = ['Rain', 'Fire crackling','Baby cry','Chainsaw','Clock tick','Dog bark','Helicopter','Person sneeze',
+              'Rooster', 'Sea waves']
 
 
 def mymain():
-    features1,labels1 = dt.initDataset("training")
+    features1,labels1 = dt.initDataset("dataset",datasetDir)
     X = features1[:,0:40]
     y = labels1
-    cf.build_decisiontree(X,y,0.2)
+    print(y)
+
+    test=cf.build_decisiontree(X,y,0.2)
+    plf.treetoimg(test)
     cf.build_knn(X, y,3,0.2)
     cf.build_randomforest(X, y, 0.2)
     cf.build_dummy(X, y, 0.2)

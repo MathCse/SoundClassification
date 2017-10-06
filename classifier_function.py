@@ -30,6 +30,7 @@ def build_decisiontree(features,label,size):
     y_predict=classifier.predict(X_test)
 
     print("Decision Tree Accuracy : %s" % accuracy_score(y_test, y_predict))
+    return classifier
 
 
 def build_knn(features, label, n_number, size):
