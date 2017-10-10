@@ -9,7 +9,7 @@ import pickle
 # ************ Pense-bête des différents attributs ************
 
 # MFCCS = 40 floats (taille fixable avec n_mfcc)
-# chroma = 6 floats
+# chroma = 12 floats
 # mel = 128 floats
 # contrast = 7 floats
 # tonnetz = 6 floats
@@ -46,7 +46,7 @@ def parse_audio_files(filepath,file_ext='*.ogg'):
         labels = np.append(labels, [labelsDic[labelName]]) # Convertit le label à la valeur associé du dictionnaire
     return np.array(features),np.array(labels,dtype=np.int)
 
-def parse_audio_files2(filepath,subdirs,file_ext='*.ogg'):
+def parseAudioFiles2(filepath,subdirs,file_ext='*.ogg'):
     features, labels= np.empty((0,193)), np.empty(0)
     for subdir in subdirs:
         for fn in glob.glob(os.path.join(filepath,subdir,file_ext)):
@@ -61,9 +61,13 @@ def parse_audio_files2(filepath,subdirs,file_ext='*.ogg'):
 def testAttribut(filename):
     X, sample_rate = librosa.load(filename)
     stft = np.abs(lb.stft(X))
-    tonnetz = np.mean(lb.feature.tonnetz(y=librosa.effects.harmonic(X), sr=sample_rate).T, axis=0)
-    print(len(tonnetz))
-    print(tonnetz)
+    chroma = np.mean(lb.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
+    print(len(chroma))
+
+def makeAttributPersistence(name,feature):
+    featureFile = open(name+'.pkl', 'wb')  # Ouverture du fichier
+    pickle.dump(feature, featureFile)  # Ecriture sur le fichier
+    featureFile.close()  # Fermuture du fichier
 
 #Cherche la persistence correspondante, si inexistente la crée
 def initDataset(maindir,subdirs):
@@ -77,7 +81,7 @@ def initDataset(maindir,subdirs):
         labelFile.close()
 
     else:
-        feature,label=parse_audio_files2(maindir,subdirs)
+        feature,label=parseAudioFiles2(maindir,subdirs)
 
         featureFile = open('dataset_features.pkl', 'wb')  # Ouverture du fichier
         pickle.dump(feature,featureFile)  # Ecriture sur le fichier
