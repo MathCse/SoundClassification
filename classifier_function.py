@@ -2,15 +2,15 @@ from sklearn import tree
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, VotingClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, VotingClassifier, BaggingClassifier
 from sklearn.dummy import DummyClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.gaussian_process.kernels import RBF
 from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
+from sklearn.svm import SVC,LinearSVC,LinearSVR
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.gaussian_process import GaussianProcessClassifier
-
+import numpy as np
 
 # ************ Pense-bête des différents classifiers ************
 
@@ -36,7 +36,7 @@ def build_decisiontree(features,label,size):
 def build_knn(features, label, n_number, size):
 
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
-    classifier = KNeighborsClassifier(n_neighbors=n_number)
+    classifier = KNeighborsClassifier(n_neighbors=n_number,weights="distance",algorithm="auto",)
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
     print("Knn Accuracy : %s" % accuracy_score(y_test, y_predict))
@@ -44,7 +44,8 @@ def build_knn(features, label, n_number, size):
 
 def build_randomforest(features,label,size):
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
-    classifier=RandomForestClassifier(n_estimators=500)
+    classifier=RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
+                                      max_depth= 15)
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
     print("Random Forest Accuracy : %s" % accuracy_score(y_test, y_predict))
@@ -60,7 +61,7 @@ def build_dummy(features,label,size):
 
 def build_neuralNetwork(features,label,size):
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
-    classifier=MLPClassifier()
+    classifier=MLPClassifier(solver="lbfgs", activation="relu",tol=1e-4 )
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
     print("Neural Network Accuracy : %s" % accuracy_score(y_test, y_predict))
@@ -76,7 +77,7 @@ def build_naivebayes(features,label,size):
 
 def build_linearsvm(features,label,size):
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
-    classifier=SVC(kernel="linear", C=0.025)
+    classifier=SVC(kernel="linear", C=0.001 , probability=True)
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
     print("Linear-svm : %s" % accuracy_score(y_test, y_predict))
@@ -84,7 +85,7 @@ def build_linearsvm(features,label,size):
 
 def build_rbfsvm(features,label,size):
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
-    classifier=SVC(gamma=2, C=1)
+    classifier=SVC(gamma='auto', C=5)
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
     print("RBF-svm Accuracy: %s" % accuracy_score(y_test, y_predict))
@@ -117,13 +118,30 @@ def build_gaussianprocess(features,label,size):
 
 def voting_classifier(features,label,size):
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
-    classifier = RandomForestClassifier(n_estimators=90)
+    classifier = RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
+                                      max_depth= 15)
     classifier2= KNeighborsClassifier(n_neighbors=2)
     classifier3= GaussianNB()
-    classifier4= tree.DecisionTreeClassifier()
-    test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('gn',classifier3),('nt',classifier4)]
-                           ,voting='soft',weights=[2,2,0.75,0.25],flatten_transform=True)
+    classifier4= MLPClassifier(solver="lbfgs", activation="relu",tol=1e-4 )
+    classifier5= SVC(kernel="linear", C=0.001, probability=True)
+    test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('gn',classifier3),('nt',classifier4),
+                                       ('lsvm',classifier5)]
+                           ,voting='soft',weights=[6,3.2,0.5,1,0.5],flatten_transform=True,n_jobs=1)
     test.fit(X_train,y_train)
     y_predict=test.predict(X_test)
     print("Voting Classifier: %s" % accuracy_score(y_test, y_predict))
     return accuracy_score(y_test, y_predict)
+
+def voting_classifier2(X_train,y_train,X_test):
+    classifier = RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
+                                      max_depth= 15)
+    classifier2= KNeighborsClassifier(n_neighbors=2)
+    classifier3= GaussianNB()
+    classifier4= MLPClassifier(solver="lbfgs", activation="relu",tol=1e-4 )
+    classifier5= SVC(kernel="linear", C=0.001, probability=True)
+    test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('gn',classifier3),('nt',classifier4),
+                                       ('lsvm',classifier5)]
+                           ,voting='soft',weights=[6,3.2,0.5,1,0.5],flatten_transform=True,n_jobs=1)
+    test.fit(X_train,y_train)
+    y_predict=test.predict(X_test)
+    return y_predict

@@ -32,26 +32,39 @@ def extractFeatures(filename):
     mel = np.mean(lb.feature.melspectrogram(X, sr=sample_rate).T, axis=0)
     contrast = np.mean(lb.feature.spectral_contrast(S=stft, sr=sample_rate).T, axis=0)
     tonnetz = np.mean(lb.feature.tonnetz(y=librosa.effects.harmonic(X), sr=sample_rate).T, axis=0)
+    zcr = lb.feature.zero_crossing_rate(y=X)
+    rmse = lb.feature.rmse(y=X)
 
-    return mfccs, chroma, mel, contrast, tonnetz
+    mean_zcr = np.mean(zcr)
+    std_zcr = np.std(zcr)
+    mean_rmse = np.mean(rmse)
+    std_rmse = np.std(rmse)
+    return mfccs, chroma, mel, contrast, tonnetz, mean_zcr, std_zcr, mean_rmse,std_rmse
 
-#Fonction pour mettre les divers attributs de tout les sons d'un dossier dans une matrice
-def parse_audio_files(filepath,file_ext='*.ogg'):
-    features, labels= np.empty((0,193)), np.empty(0)
-    for fn in glob.glob(os.path.join('dataset',filepath,file_ext)):
-        mfccs, chroma, mel, contrast, tonnetz = extractFeatures(fn) # extraction des attributs d'un son
-        extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz]) # Regroupes les attributs du son dans un tab
-        features = np.vstack([features, extFeatures]) # Met le tableau d'attributs dans la matrice
-        labelName=fn.split('-')[2].split('.')[0] # Decoupe le filename pour récupérer le label
-        labels = np.append(labels, [labelsDic[labelName]]) # Convertit le label à la valeur associé du dictionnaire
-    return np.array(features),np.array(labels,dtype=np.int)
+def extractFeatures2(X,sample_rate):
+    stft= np.abs(lb.stft(X))
+    mfccs= np.mean(lb.feature.mfcc(y=X,sr=sample_rate,n_mfcc=40).T,axis=0)
+    chroma = np.mean(lb.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
+    mel = np.mean(lb.feature.melspectrogram(X, sr=sample_rate).T, axis=0)
+    contrast = np.mean(lb.feature.spectral_contrast(S=stft, sr=sample_rate).T, axis=0)
+    tonnetz = np.mean(lb.feature.tonnetz(y=librosa.effects.harmonic(X), sr=sample_rate).T, axis=0)
+    zcr = lb.feature.zero_crossing_rate(y=X)
+    rmse = lb.feature.rmse(y=X)
+
+    mean_zcr = np.mean(zcr)
+    std_zcr = np.std(zcr)
+    mean_rmse = np.mean(rmse)
+    std_rmse = np.std(rmse)
+    return mfccs, chroma, mel, contrast, tonnetz, mean_zcr, std_zcr, mean_rmse,std_rmse
 
 def parseAudioFiles2(filepath,subdirs,file_ext='*.ogg'):
-    features, labels= np.empty((0,193)), np.empty(0)
+    features, labels= np.empty((0,197)), np.empty(0)
     for subdir in subdirs:
         for fn in glob.glob(os.path.join(filepath,subdir,file_ext)):
-            mfccs, chroma, mel, contrast, tonnetz = extractFeatures(fn) # extraction des attributs d'un son
-            extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz]) # Regroupes les attributs du son dans un tab
+            mfccs, chroma, mel, contrast, tonnetz, mzcr,stdzcr,mrmse,stdrmse= \
+                extractFeatures(fn) # extraction des attributs d'un son
+            extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz,mzcr,stdzcr,
+                                     mrmse,stdrmse ]) # Regroupes les attributs du son dans un tab
             features = np.vstack([features, extFeatures]) # Met le tableau d'attributs dans la matrice
             labels = np.append(labels, [datasetDic[subdir]]) # Convertit le label à la valeur associé du dictionnaire
     return np.array(features),np.array(labels,dtype=np.int)
@@ -92,3 +105,19 @@ def initDataset(maindir,subdirs):
         labelFile.close()
 
     return feature,label
+
+
+def soundAnalysis(path,maxDB):
+    features= np.empty((0, 197))
+    y,sr=lb.load(path)
+    m = lb.samples_to_time(lb.effects.split(y=y, top_db=maxDB))
+
+    for sound in m:
+        y, sr = lb.load(path,offset=sound[0],duration=sound[1]-sound[0])
+        mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr, mrmse, stdrmse = \
+            extractFeatures2(y,sr)  # extraction des attributs d'un son
+        extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr,
+                                 mrmse, stdrmse])  # Regroupes les attributs du son dans un tab
+        features = np.vstack([features, extFeatures])  # Met le tableau d'attributs dans la matrice
+
+    return np.array(features),m

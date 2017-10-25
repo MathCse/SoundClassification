@@ -1,10 +1,10 @@
 import dataset_functions as dt
 import time
 import classifier_function as cf
-import librosa
+import librosa as lb
 import plot_functions as plf
 import numpy as np
-from sklearn.ensemble import voting_classifier
+from sklearn import preprocessing
 
 # ************ Pense-bête des différents attributs ************
 
@@ -25,11 +25,15 @@ def mymain():
 
     features1,labels1 = dt.initDataset("dataset",datasetDir)
 
-    X = features1[:,0:193]
-    y = labels1
+    X_train = features1[:,0:197]
+    y_train = labels1
 
-    for i in range(10):
-        cf.voting_classifier(X,y,0.2)
+    X_test,m = dt.soundAnalysis("pistetest.wav",27)
+
+    y_pred=cf.voting_classifier2(X_train,y_train,X_test)
+
+    plf.plotwaverform2("pistetest.wav",y_pred,m)
+
 
 
 if __name__ == '__main__':
