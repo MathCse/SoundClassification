@@ -121,3 +121,28 @@ def soundAnalysis(path,maxDB):
         features = np.vstack([features, extFeatures])  # Met le tableau d'attributs dans la matrice
 
     return np.array(features),m
+
+def soundAnalysis2(path,maxDB) :
+    features = np.empty((0, 197))
+    y, sr = lb.load(path)
+    sounds = lb.effects.split(y=y, top_db=maxDB)
+    m = lb.samples_to_time(sounds)
+
+    for sound in sounds:
+        path_sound = "sound.wav"
+        lb.output.write_wav(path_sound, y[sound[0]:sound[1]], sr)
+
+        y_sound, sr_sound = lb.load(path_sound)
+
+        mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr, mrmse, stdrmse = \
+            extractFeatures2(y_sound, sr_sound)  # extraction des attributs d'un son
+
+        extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr,
+                                 mrmse, stdrmse])  # Regroupes les attributs du son dans un tab
+
+
+        features = np.vstack([features, extFeatures])  # Met le tableau d'attributs dans la matrice
+
+        os.remove(path_sound)
+
+    return np.array(features), m

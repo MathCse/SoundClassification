@@ -28,7 +28,7 @@ def mymain():
     X_train = features1[:,0:197]
     y_train = labels1
 
-    X_test,m = dt.soundAnalysis("pistetest.wav",27)
+    X_test,m = dt.soundAnalysis2("pistetest.wav",27)
 
     y_pred=cf.voting_classifier2(X_train,y_train,X_test)
 
