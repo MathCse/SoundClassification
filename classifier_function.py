@@ -11,6 +11,7 @@ from sklearn.svm import SVC,LinearSVC,LinearSVR
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.gaussian_process import GaussianProcessClassifier
 import numpy as np
+import pre_processing as pp
 
 # ************ Pense-bête des différents classifiers ************
 
@@ -34,8 +35,7 @@ def build_decisiontree(features,label,size):
 
 
 def build_knn(features, label, n_number, size):
-
-    X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
+    X_train, X_test, y_train, y_test = pp.splitAndPP(features, label, 0.15)
     classifier = KNeighborsClassifier(n_neighbors=n_number,weights="distance",algorithm="auto",)
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
@@ -43,7 +43,7 @@ def build_knn(features, label, n_number, size):
     return accuracy_score(y_test, y_predict)
 
 def build_randomforest(features,label,size):
-    X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
+    X_train, X_test, y_train, y_test = pp.splitAndPP(features, label, 0.15)
     classifier=RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
                                       max_depth= 15)
     classifier.fit(X_train,y_train)
@@ -60,7 +60,7 @@ def build_dummy(features,label,size):
     return accuracy_score(y_test, y_predict)
 
 def build_neuralNetwork(features,label,size):
-    X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
+    X_train, X_test, y_train, y_test = pp.splitAndPP(features, label, 0.15)
     classifier=MLPClassifier(solver="lbfgs", activation="relu",tol=1e-4 )
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
@@ -68,7 +68,7 @@ def build_neuralNetwork(features,label,size):
     return accuracy_score(y_test, y_predict)
 
 def build_naivebayes(features,label,size):
-    X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
+    X_train, X_test, y_train, y_test = pp.splitAndPP(features, label, 0.15)
     classifier=GaussianNB()
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
@@ -121,12 +121,12 @@ def voting_classifier(features,label,size):
     classifier = RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
                                       max_depth= 15)
     classifier2= KNeighborsClassifier(n_neighbors=2)
-    classifier3= GaussianNB()
+    # classifier3= GaussianNB()
     classifier4= MLPClassifier(solver="lbfgs", activation="relu",tol=1e-4 )
     classifier5= SVC(kernel="linear", C=0.001, probability=True)
-    test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('gn',classifier3),('nt',classifier4),
+    test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('nt',classifier4),
                                        ('lsvm',classifier5)]
-                           ,voting='soft',weights=[6,3.2,0.5,1,0.5],flatten_transform=True,n_jobs=1)
+                           ,voting='soft',weights=[3,3,3,1],flatten_transform=True,n_jobs=1)
     test.fit(X_train,y_train)
     y_predict=test.predict(X_test)
     print("Voting Classifier: %s" % accuracy_score(y_test, y_predict))
@@ -136,12 +136,12 @@ def voting_classifier2(X_train,y_train,X_test):
     classifier = RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
                                       max_depth= 15)
     classifier2= KNeighborsClassifier(n_neighbors=2)
-    classifier3= GaussianNB()
+    # classifier3= GaussianNB()
     classifier4= MLPClassifier(solver="lbfgs", activation="relu",tol=1e-4 )
     classifier5= SVC(kernel="linear", C=0.001, probability=True)
-    test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('gn',classifier3),('nt',classifier4),
+    test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('nt',classifier4),
                                        ('lsvm',classifier5)]
-                           ,voting='soft',weights=[6,3.2,0.5,1,0.5],flatten_transform=True,n_jobs=1)
+                           ,voting='soft',weights=[3,3,3,1],flatten_transform=True,n_jobs=1)
     test.fit(X_train,y_train)
     y_predict=test.predict(X_test)
     return y_predict

@@ -25,6 +25,7 @@ datasetDic ={'Rain': 0, 'Fire crackling': 1,'Baby cry': 2,'Chainsaw':3,'Clock ti
 
 #Fonction pour extraire les attributs
 def extractFeatures(filename):
+    print(filename)
     X, sample_rate= librosa.load(filename)
     stft= np.abs(lb.stft(X))
     mfccs= np.mean(lb.feature.mfcc(y=X,sr=sample_rate,n_mfcc=40).T,axis=0)
@@ -113,12 +114,13 @@ def soundAnalysis(path,maxDB):
     m = lb.samples_to_time(lb.effects.split(y=y, top_db=maxDB))
 
     for sound in m:
-        y, sr = lb.load(path,offset=sound[0],duration=sound[1]-sound[0])
-        mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr, mrmse, stdrmse = \
-            extractFeatures2(y,sr)  # extraction des attributs d'un son
-        extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr,
-                                 mrmse, stdrmse])  # Regroupes les attributs du son dans un tab
-        features = np.vstack([features, extFeatures])  # Met le tableau d'attributs dans la matrice
+        y, sr = lb.load(path, offset=sound[0], duration=sound[1] - sound[0])
+        if np.isfinite(y).all() and len(y)>512:
+            mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr, mrmse, stdrmse = \
+                extractFeatures2(y,sr)  # extraction des attributs d'un son
+            extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr,
+                                     mrmse, stdrmse])  # Regroupes les attributs du son dans un tab
+            features = np.vstack([features, extFeatures])  # Met le tableau d'attributs dans la matrice
 
     return np.array(features),m
 

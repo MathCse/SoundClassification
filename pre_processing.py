@@ -5,7 +5,6 @@ import librosa as lb
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-import gaussianize as g
 import classifier_function as cf
 from sklearn.feature_extraction import DictVectorizer
 import math
