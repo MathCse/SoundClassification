@@ -4,7 +4,7 @@ import classifier_function as cf
 import librosa as lb
 import plot_functions as plf
 import numpy as np
-from sklearn import preprocessing
+import pre_processing as pp
 
 # ************ Pense-bête des différents attributs ************
 
@@ -25,14 +25,10 @@ def mymain():
 
     features1,labels1 = dt.initDataset("dataset",datasetDir)
 
-    X_train = features1[:,0:197]
-    y_train = labels1
+    X = features1[:,0:197]
+    y = labels1
 
-    X_test,m = dt.soundAnalysis2("pistetest.wav",27)
-
-    y_pred=cf.voting_classifier2(X_train,y_train,X_test)
-
-    plf.plotwaverform2("pistetest.wav",y_pred,m)
+    X_train, X_test, y_train, y_test = pp.splitAndPP(X, y, 0.2) #Preprocessing
 
 
 
