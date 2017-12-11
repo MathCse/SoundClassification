@@ -103,3 +103,38 @@ def confusion_matrix(cm,classes,normalize=True,cmap= clm.get_cmap('YlOrBr')  ,ti
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
 
+
+def printprobatable(table):
+
+    columns= ['Rain', 'Fire crackling','Baby cry','Chainsaw','Clock tick','Dog bark','Helicopter','Person sneeze',
+              'Rooster', 'Sea waves']
+
+    fig,ax = plt.subplots()
+    ncols,nrows=len(columns),len(table)
+    hcell, wcell = 0.1, 0.1
+    hpad, wpad = 0.5, 0.5
+
+
+    fig.patch.set_visible(False)
+    ax.axis('off')
+    ax.axis('tight')
+
+    printtable = ax.table(cellText=table,
+            colLabels=columns,
+            loc='center')
+    printtable.set_fontsize(100)
+    printtable.scale(1,1)
+    plt.show()
+
+def rmseprint(sound):
+    y,st= lb.load(sound)
+
+    S, phase = librosa.magphase(librosa.stft(y))
+    rms = librosa.feature.rmse(S=S)
+
+    plt.figure()
+    plt.semilogy(rms.T, label='RMS Energy')
+    plt.xticks([])
+    plt.xlim([0, rms.shape[-1]])
+    plt.legend(loc='best')
+    plt.show()

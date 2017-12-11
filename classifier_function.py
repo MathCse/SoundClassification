@@ -48,8 +48,10 @@ def build_randomforest(features,label,size):
                                       max_depth= 15)
     classifier.fit(X_train,y_train)
     y_predict = classifier.predict(X_test)
+    y_predict_proba= np.around(classifier.predict_proba(X_test), decimals=2)
     print("Random Forest Accuracy : %s" % accuracy_score(y_test, y_predict))
-    return accuracy_score(y_test, y_predict)
+    print(y_predict_proba)
+    return y_predict_proba
 
 def build_dummy(features,label,size):
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)

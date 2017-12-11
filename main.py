@@ -43,38 +43,23 @@ def mymain():
 
     X = features1[:,0:197]
     y = labels1
-    cnf_matrix = np.zeros((10, 10))
-    acc=0
-    for i in range(50):
-        X_train, X_test, y_train, y_test = pp.splitAndPP(X, y, 0.15) #Preprocessing
 
+    table = cf.build_randomforest(X,y,0.15)
+    plf.rmseprint('test2.wav')
+    plf.plotwaverform('test2.wav')
 
-        classifier = RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
-                                              max_depth= 15)
-        classifier2 = KNeighborsClassifier(n_neighbors=1)
-        classifier3= GaussianNB()
-        test= MLPClassifier(solver="lbfgs", activation="relu",tol=1e-4 )
-        # test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('nt',classifier4)]
-        #                            ,voting='soft',weights=[30,15,15],n_jobs=1)
-        test.fit(X_train, y_train)
-        y_predict = test.predict(X_test)
+ # # Compute confusion matrix
+    #  cnf_matrix = np.add(confusion_matrix(y_test, y_predict),cnf_matrix)
+    # print(cnf_matrix)
 
-        acc+=accuracy_score(y_test,y_predict)
+    # test=cnf_matrix
+    # np.set_printoptions(precision=2)
 
-
-        # Compute confusion matrix
-        cnf_matrix = np.add(confusion_matrix(y_test, y_predict),cnf_matrix)
-        print(cnf_matrix)
-
-    test=cnf_matrix
-    np.set_printoptions(precision=2)
-
-    # Plot normalized confusion matrix
-    plt.figure()
-    plf.confusion_matrix(test, classes=datasetDir,
-                          title='Normalized confusion matrix : Neural network')
-    print(acc / 50)
-    plt.show()
+    # # Plot normalized confusion matrix
+    # plt.figure()
+    # plf.confusion_matrix(test, classes=datasetDir,title='Normalized confusion matrix : Neural network')
+    # print(acc / 50)
+    # plt.show()
 
 
 
