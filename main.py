@@ -45,8 +45,9 @@ def mymain():
     y = labels1
 
     table = cf.build_randomforest(X,y,0.15)
-    plf.rmseprint('test2.wav')
-    plf.plotwaverform('test2.wav')
+    plf.rmseprint('1minsoundtest.wav')
+    plf.rmsederiveeprint('1minsoundtest.wav')
+    #plf.plotwaverform('1minsoundtestbruit.wav')
 
  # # Compute confusion matrix
     #  cnf_matrix = np.add(confusion_matrix(y_test, y_predict),cnf_matrix)

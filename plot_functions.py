@@ -127,7 +127,7 @@ def printprobatable(table):
     plt.show()
 
 def rmseprint(sound):
-    y,st= lb.load(sound)
+    y,sr= lb.load(sound,sr=5000)
 
     S, phase = librosa.magphase(librosa.stft(y))
     rms = librosa.feature.rmse(S=S)
@@ -137,4 +137,27 @@ def rmseprint(sound):
     plt.xticks([])
     plt.xlim([0, rms.shape[-1]])
     plt.legend(loc='best')
+    plt.show()
+
+def rmsederiveeprint(sound):
+    y,sr= lb.load(sound,sr=5000)
+
+    S, phase = librosa.magphase(librosa.stft(y))
+    rms = librosa.feature.rmse(S=S)
+
+    y = []
+
+    for i in range(len(rms[0])-1):
+        y.append((rms[0][i+1]-rms[0][i]))
+
+    print(len(rms[0]))
+
+    plt.figure()
+    #plt.semilogy(y, label='RMS Energy')
+    plt.plot(y)
+    plt.xticks([])
+    plt.xlim([0, rms.shape[-1]])
+    plt.legend(loc='best')
+    plt.axis('auto')
+    plt.xlabel('Temps')
     plt.show()
