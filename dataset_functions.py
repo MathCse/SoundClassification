@@ -148,3 +148,56 @@ def soundAnalysis2(path,maxDB) :
         os.remove(path_sound)
 
     return np.array(features), m
+
+def findtoplabel(table):
+
+    maxi=max(table)
+    index = int(np.argmax(table))
+    return index,maxi
+
+def initsoundanalysis3(path,model,pas):
+
+    y,sr=lb.load(path)
+    times=[0,pas]
+    mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr, mrmse, stdrmse = \
+        extractFeatures2(y[times[0]:times[1]], sr)  # extraction des attributs d'un son
+    extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr,
+                             mrmse, stdrmse])  # Regroupes les attributs du son dans un tab
+
+    y_predictproba = np.around(model.predict_proba([extFeatures]), decimals=2)
+    label, max = findtoplabel(y_predictproba[0])
+    times[1] += pas
+    return label,times,max
+
+
+def soundanalysis3(path,model,pas=44100):
+    y,sr=lb.load(path)
+    tmax=len(y)/sr
+    prelabel,times,prevmax=initsoundanalysis3(path,model,pas)
+    events = np.empty((0, 4))
+
+    while (times[1]+pas)/sr<tmax:
+        a=int(times[0])
+        b = int(times[1])
+        mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr, mrmse, stdrmse = \
+            extractFeatures2(y[a:b], sr)  # extraction des attributs d'un son
+        extFeatures = np.hstack([mfccs, chroma, mel, contrast, tonnetz, mzcr, stdzcr,
+                                     mrmse, stdrmse])  # Regroupes les attributs du son dans un tab
+
+        extFeatures= extFeatures.reshape(1,-1)
+
+        y_predictproba= np.around(model.predict_proba(extFeatures), decimals=2)
+        label,max = findtoplabel(y_predictproba[0])
+
+        if label != prelabel:
+            events = np.vstack([(np.hstack([max,label,times[0]/sr,times[1]/sr])),events])
+            prelabel=label
+            times[0] = times[1]
+            times[1] += pas
+
+        else:
+            times[1] += pas
+
+
+    return events
+

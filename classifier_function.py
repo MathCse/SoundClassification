@@ -53,6 +53,13 @@ def build_randomforest(features,label,size):
     print(y_predict_proba)
     return y_predict_proba
 
+
+def rfanalysis(features,label):
+    classifier=RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
+                                      max_depth= 15)
+    classifier.fit(features,label)
+    return classifier
+
 def build_dummy(features,label,size):
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
     classifier=DummyClassifier()

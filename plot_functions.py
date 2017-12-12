@@ -150,14 +150,59 @@ def rmsederiveeprint(sound):
     for i in range(len(rms[0])-1):
         y.append((rms[0][i+1]-rms[0][i]))
 
-    print(len(rms[0]))
-
     plt.figure()
-    #plt.semilogy(y, label='RMS Energy')
     plt.plot(y)
     plt.xticks([])
     plt.xlim([0, rms.shape[-1]])
     plt.legend(loc='best')
     plt.axis('auto')
     plt.xlabel('Temps')
+    plt.show()
+
+
+def printdetecgraph(sound,sr=22050):
+    y, sr = lb.load(sound, sr=sr)
+
+    S, phase = librosa.magphase(librosa.stft(y))
+    rms = librosa.feature.rmse(S=S)
+
+    x = []
+
+    for i in range(len(rms[0])-1):
+        x.append((rms[0][i+1]-rms[0][i]))
+
+    plt.figure(1)
+    plt.subplot(311)
+
+    plt.semilogy(rms.T, label='RMS Energy')
+    plt.xticks([])
+    plt.xlim([0, rms.shape[-1]])
+    plt.legend(loc='best')
+
+    plt.subplot(312)
+    plt.plot(x)
+    plt.xticks([])
+    plt.xlim([0, rms.shape[-1]])
+    plt.legend(loc='best')
+    plt.axis('auto')
+
+    plt.subplot(313)
+    librosa.display.waveplot(y, sr, color='black')
+
+
+    plt.show()
+
+
+
+def printanalysis(path,events):
+    y,sr =lb.load(path)
+    plt.figure()
+    ax = plt.subplot(2,1,1)
+    librosa.display.waveplot(y,sr,color='black')
+    plt.title("Waveform")
+    for line in events:
+         plt.axvspan(line[2],line[3],color='green',alpha=0.5,ymin=0.1,ymax=0.9)
+         for k,v in datasetDic.items():
+             if v == line[1]:
+                plt.Axes.text(x=(line[2]+line[3])/2,y=-1,s=k,self=ax,color="blue",size=6,horizontalalignment='center')
     plt.show()
