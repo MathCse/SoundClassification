@@ -11,7 +11,7 @@ from matplotlib import cm as clm
 import itertools
 
 datasetDic ={'Rain': 0, 'Fire crack': 1,'Baby cry': 2,'Chainsaw':3,'Clock':4,'Dog bark':5,'Helico':6,
-             'sneeze':7,'Rooster':8,'Sea waves':9}
+             'sneeze':7,'Rooster':8,'Sea waves':9, 'Non reconnu':10}
 
 
 #Fonction pour faire un spectrogramme à partir d'un son importé

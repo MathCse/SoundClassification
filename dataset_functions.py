@@ -21,7 +21,7 @@ import pickle
 # Il nous faut d'autres labels
 labelsDic = {'R': 0, 'F': 1}
 datasetDic ={'Rain': 0, 'Fire crackling': 1,'Baby cry': 2,'Chainsaw':3,'Clock tick':4,'Dog bark':5,'Helicopter':6,
-             'Person sneeze':7,'Rooster':8,'Sea waves':9}
+             'Person sneeze':7,'Rooster':8,'Sea waves':9, 'Non reconnu':10}
 
 #Fonction pour extraire les attributs
 def extractFeatures(filename):
@@ -153,6 +153,8 @@ def findtoplabel(table):
 
     maxi=max(table)
     index = int(np.argmax(table))
+    if maxi<0.40:
+        index=10
     return index,maxi
 
 def initsoundanalysis3(path,model,pas):
@@ -189,13 +191,18 @@ def soundanalysis3(path,model,pas=44100):
         y_predictproba= np.around(model.predict_proba(extFeatures), decimals=2)
         label,max = findtoplabel(y_predictproba[0])
 
-        if label != prelabel:
-            events = np.vstack([(np.hstack([max,label,times[0]/sr,times[1]/sr])),events])
-            prelabel=label
-            times[0] = times[1]
+        if max<0.40:
+            prevmax = max
             times[1] += pas
-
+        elif max>0.40 and max>prevmax:
+            prevmax = max
+            times[1] += pas
+        elif max>0.40:
+            prevmax = max
+            times[1] += pas
         else:
+            events = np.vstack([(np.hstack([max, label, times[0] / sr, times[1] / sr])), events])
+            times[0] = times[1]
             times[1] += pas
 
 

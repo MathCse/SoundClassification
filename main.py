@@ -30,7 +30,7 @@ import pre_processing as pp
 # contrast = 7 floats
 # tonnetz = 6 floats
 
-# *************************************************************
+# *************************************************************&
 
 datasetDir = ['Rain', 'Fire crackling','Baby cry','Chainsaw','Clock tick','Dog bark','Helicopter','Person sneeze',
               'Rooster', 'Sea waves']
@@ -47,8 +47,8 @@ def mymain():
 
     #table = cf.build_randomforest(X,y,0.15)
 
-    test= dt.soundanalysis3("test2.wav", cf.rfanalysis(X,y),pas=66150)
-    plf.printanalysis("test2.wav",test)
+    test= dt.soundanalysis3("1minsoundtest.wav", cf.rfanalysis(X,y),pas=44100)
+    plf.printanalysis("1minsoundtest.wav",test)
 
     #plf.printdetecgraph("test2.wav")
 
