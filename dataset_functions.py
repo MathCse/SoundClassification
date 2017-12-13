@@ -191,20 +191,28 @@ def soundanalysis3(path,model,pas=44100):
         y_predictproba= np.around(model.predict_proba(extFeatures), decimals=2)
         label,max = findtoplabel(y_predictproba[0])
 
-        if max<0.40:
+        if times[1] - times[0]>=110250:
+            times[0] = times[1]
+            times[1] += pas
+        elif max<0.40:
             prevmax = max
             times[1] += pas
-        elif max>0.40 and max>prevmax:
-            prevmax = max
-            times[1] += pas
-        elif max>0.40:
-            prevmax = max
-            times[1] += pas
-        else:
+        elif max>=0.40 and max<prevmax:
             events = np.vstack([(np.hstack([max, label, times[0] / sr, times[1] / sr])), events])
             times[0] = times[1]
             times[1] += pas
+        elif max>=0.40 and max>=prevmax:
+            prevmax = max
+            times[1] += pas
+        else:
+            prevmax = max
+            times[1] += pas
 
+        if((times[1]+pas)/sr>=tmax):
+            events = np.vstack([(np.hstack([max, label, times[0] / sr, times[1] / sr])), events])
+
+        print(times)
+        print(events)
 
     return events
 
