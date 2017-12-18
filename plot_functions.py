@@ -204,5 +204,5 @@ def printanalysis(path,events):
          plt.axvspan(line[2],line[3],color='green',alpha=0.5,ymin=0.1,ymax=0.9)
          for k,v in datasetDic.items():
              if v == line[1]:
-                plt.Axes.text(x=(line[2]+line[3])/2,y=-1,s=k,self=ax,color="blue",size=6,horizontalalignment='center')
+                plt.Axes.text(x=(line[2]+line[3])/2,y=-1,s=str(int(line[1])),self=ax,color="blue",size=6,horizontalalignment='center')
     plt.show()

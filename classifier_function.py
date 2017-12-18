@@ -60,6 +60,20 @@ def rfanalysis(features,label):
     classifier.fit(features,label)
     return classifier
 
+
+def voting_classifier2(X_train,y_train,X_test):
+    classifier = RandomForestClassifier(n_estimators=90, max_features="sqrt", criterion="gini",oob_score= False,
+                                      max_depth= 15)
+    classifier2= KNeighborsClassifier(n_neighbors=2)
+    classifier4= MLPClassifier(solver="lbfgs", activation="relu",tol=1e-4 )
+    classifier5= SVC(kernel="linear", C=0.001, probability=True)
+    test= VotingClassifier(estimators=[('rf',classifier),('kn',classifier2),('nt',classifier4),
+                                       ('lsvm',classifier5)]
+                           ,voting='soft',weights=[3,3,3,1],flatten_transform=True,n_jobs=1)
+    test.fit(X_train,y_train)
+    y_predict=test.predict(X_test)
+    return y_predict
+
 def build_dummy(features,label,size):
     X_train, X_test, y_train, y_test = train_test_split(features, label, test_size=size, random_state=100)
     classifier=DummyClassifier()

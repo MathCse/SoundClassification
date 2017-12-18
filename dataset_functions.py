@@ -153,7 +153,7 @@ def findtoplabel(table):
 
     maxi=max(table)
     index = int(np.argmax(table))
-    if maxi<0.40:
+    if maxi<0.30:
         index=10
     return index,maxi
 
@@ -191,17 +191,17 @@ def soundanalysis3(path,model,pas=44100):
         y_predictproba= np.around(model.predict_proba(extFeatures), decimals=2)
         label,max = findtoplabel(y_predictproba[0])
 
-        if times[1] - times[0]>=110250:
-            times[0] = times[1]
-            times[1] += pas
-        elif max<0.40:
+        if times[1] - times[0]>=66150:
+            times[0] += pas
+            times[1] = times[0]+ pas
+        elif max<0.30:
             prevmax = max
             times[1] += pas
-        elif max>=0.40 and max<prevmax:
+        elif max>=0.30 and max<prevmax:
             events = np.vstack([(np.hstack([max, label, times[0] / sr, times[1] / sr])), events])
             times[0] = times[1]
             times[1] += pas
-        elif max>=0.40 and max>=prevmax:
+        elif max>=0.30 and max>=prevmax:
             prevmax = max
             times[1] += pas
         else:
