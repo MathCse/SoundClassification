@@ -48,7 +48,8 @@ def mymain():
     #table = cf.build_randomforest(X,y,0.15)
 
     test= dt.soundanalysis3("1minsoundtest.wav", cf.rfanalysis(X,y),pas=11025)
-    plf.printanalysis("1minsoundtest.wav",test)
+    new= plf.regroupevent(test)
+    #plf.printanalysis("1minsoundtest.wav",test)
 
     #plf.printdetecgraph("test2.wav")
 
