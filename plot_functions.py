@@ -201,13 +201,13 @@ def regroupevent(events):
         if events[count][1] == events[borneinf][1]:
             bornesup=count
         if events[borneinf][1] != events[count][1]:
-            event= np.hstack(events[borneinf][0] + events[bornesup][0]) / 2, events[borneinf][1], events[bornesup][2], events[borneinf][3])
+            event= np.hstack((events[borneinf][0] + events[bornesup][0]) / 2, events[borneinf][1], events[bornesup][2], events[borneinf][3])
             new=np.vstack(new,event)
             bornesup=count
             borneinf=count
         count+=1
     new.append([(events[borneinf][0] + events[bornesup][0]) / 2, events[borneinf][1], events[bornesup][2],
-                          events[borneinf][3])
+                          events[borneinf][3]])
     print(new)
     return new
 
